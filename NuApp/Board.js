@@ -4,8 +4,8 @@ import { FlatGrid} from 'react-native-super-grid';
 import Square from './Square';
 import playerPieces from './playerPieces.js';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-let throne = require("./throne.jpg");
-let throne2 = require("./throne2.gif");
+import * as Font from 'expo-font';
+let throne = require("./throne2.gif");
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -43,6 +43,7 @@ let showingBoard1 = true
 let firstPlayerTurn = true
 let gameOver = false
 let bottomGrid = []
+let fontLoaded = false
 
 export default class Board extends React.Component {
   
@@ -76,7 +77,15 @@ export default class Board extends React.Component {
         this.endDrag()
       },
     });
-}
+  }
+
+  async componentDidMount() {
+    await Font.loadAsync({
+      'got': require('./assets/fonts/got.ttf'),
+    });
+    fontLoaded = true
+    this.setState({updated: !this.state.updated})
+  }
 
   handlePress = (id) => {
     if(gameOver || showingBoard1 || !gameStarted || !firstPlayerTurn){
@@ -560,13 +569,13 @@ export default class Board extends React.Component {
     return (
       <View style={styles.container}>
         <View style = {styles.imageContainer}>
-          <Image style = {styles.background} source =  {throne2} />
+          <Image style = {styles.background} source =  {throne} />
         </View>
         <View style = {styles.buttonOneContainer}>
-          {<TouchableOpacity onPress={gameStarted ? this.changeBoard : this.createAIBoard}><Text style={styles.buttonText}>{!gameStarted ? "Battle" : showingBoard1 ? "Show Opponent's Board" : "Show Your Board"}</Text></TouchableOpacity>}
+          {<TouchableOpacity onPress={gameStarted ? this.changeBoard : this.createAIBoard}><Text style={!fontLoaded ? styles.buttonText : !gameStarted ? styles.gotText: !showingBoard1 ?styles.gotTextSmall : styles.gotTextXSmall}>{!gameStarted ? "Battle" : showingBoard1 ? "Show Opponent's Board" : "Show Your Board"}</Text></TouchableOpacity>}
         </View>
         <View style = {styles.buttonTwoContainer}>
-          {<TouchableOpacity onPress={gameStarted ? this.resetGame : () => this.props.navigation.navigate("ChooseCharacter")}><Text style={styles.buttonText}>{!gameStarted ? "Choose Character" : "Reset"}</Text></TouchableOpacity>}
+          {<TouchableOpacity onPress={gameStarted ? this.resetGame : () => this.props.navigation.navigate("ChooseCharacter")}><Text style={!fontLoaded ? styles.buttonText : gameStarted ? styles.gotText: styles.gotTextSmall}>{!gameStarted ? "Choose Character" : "Reset"}</Text></TouchableOpacity>}
         </View>
         <FlatGrid
         itemDimension={screenWidth * 0.9 * 0.1}
@@ -660,5 +669,29 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 25,
     color: 'white'
+  },
+  gotText: {
+    fontSize: 25,
+    color: 'white',
+    fontFamily: 'got',
+    textShadowColor: '#bf2d32',
+    textShadowOffset: {width: 1, height: 0},
+    textShadowRadius: 3
+  },
+  gotTextSmall: {
+    fontSize: 20,
+    color: 'white',
+    fontFamily: 'got',
+    textShadowColor: '#bf2d32',
+    textShadowOffset: {width: 1, height: 0},
+    textShadowRadius: 3
+  },
+  gotTextXSmall: {
+    fontSize: 18,
+    color: 'white',
+    fontFamily: 'got',
+    textShadowColor: '#bf2d32',
+    textShadowOffset: {width: 1, height: 0},
+    textShadowRadius: 3
   }
 });
